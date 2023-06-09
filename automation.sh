@@ -22,3 +22,21 @@ sudo tar -cvf tmp/${my_name}-httpd-logs-${timestamp}.tar var/log/apache2
 sudo aws s3 cp /tmp/${my_name}-httpd-logs-${timestamp}.tar s3://${s3_bucket}/${my_name}-httpd-logs-${timestamp}.tar
 
 sudo chmod  +x  /Automation_Project/automation.sh
+
+inventory_file="/var/www/html/inventory.html"
+tmp_file="/tmp/${my_name}-httpd-logs-${timestamp}.tar"
+
+# Check if inventory.html file exists
+if [ ! -f "$inventory_file" ]; then
+  echo "Creating inventory.html file..."
+  echo "Log Type        Date Created    Type    Size" > "$inventory_file"
+fi
+
+# Get file details from the other file
+file_name="httpd-logs"
+file_type="tar"
+file_size=$(du -h ${tmp_file}| cut -f1)
+
+# Add file details to inventory.html
+echo "${file_name}      ${timestamp}    ${file_type}    ${file_size}" >> "$inventory_file"
+echo "File details added to inventory.html"
